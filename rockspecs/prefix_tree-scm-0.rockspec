@@ -18,7 +18,7 @@ dependencies = {
 
 build = {
   type = "builtin",
-  copy_directories = {},
+  copy_directories = {"test"},
 
   modules = {
     ["prefix_tree"        ] = "src/prefix_tree.lua",

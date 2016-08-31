@@ -427,7 +427,7 @@ end
 local function self_test()
 
   local E = true
-  local FIXME = true
+  local FIXME = false
 
   test_pack_roll(E, 
   {
