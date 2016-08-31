@@ -161,7 +161,7 @@ end
 function tree_index:keys()
   local t = {}
   self:for_each(function(prefix)
-    t[t + 1] = prefix
+    t[#t + 1] = prefix
   end)
   return t
 end

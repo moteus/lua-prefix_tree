@@ -831,6 +831,7 @@ local tree = {
   find          = find;
   pack          = pack;
   sub_tree      = sub_tree;
+  for_each      = for_each;
   for_each_sort = for_each_sort;
   transform     = transform;
 
