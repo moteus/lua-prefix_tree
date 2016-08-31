@@ -35,8 +35,10 @@ before_script:
   - luarocks show lunitx           || luarocks install lunitx
 
 script:
+  - cd test
   - lua -lluacov -e'require "prefix_tree.tree".__self_test()'
   - lua -lluacov -e'require "prefix_tree.list".__self_test()'
+  - lunit.sh test.lua
 
 after_success:
   - luacov-coveralls

@@ -2,6 +2,11 @@ local tree = require "prefix_tree.tree"
 local list = require "prefix_tree.list"
 local ut   = require "prefix_tree.utils"
 
+local _COPYRIGHT = "Copyright (C) 2016 Alexey Melnichuk";
+local _VERSION   = '0.1.0-dev'
+local _NAME      = 'prefix_tree'
+
+
 local function LoadPrefixFromFile_impl(FileName_or_file, functor, pack_range)
   local file, do_close
   if type(FileName_or_file) == 'string' then
@@ -279,7 +284,17 @@ local function LoadPrefixFromFile(...)
   return tree, prefix_list_t
 end
 
+local function self_test()
+  tree.__self_test()
+  list.__self_test()
+end
+
 return {
+  _NAME                    = _NAME;
+  _VERSION                 = _VERSION;
+  _COPYRIGHT               = _COPYRIGHT;
+
+  __self_test              = self_test;
   new                      = tree_index.new;
   LoadPrefixFromFile       = LoadPrefixFromFile;
   INVALID_VALUE_ALWAYS_NIL = tree.INVALID_VALUE_ALWAYS_NIL;

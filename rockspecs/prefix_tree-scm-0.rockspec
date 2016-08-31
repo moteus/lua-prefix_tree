@@ -22,8 +22,8 @@ build = {
 
   modules = {
     ["prefix_tree"        ] = "src/prefix_tree.lua",
-    ["prefix_tree.tree"   ] = "src/prefix_tree.tree",
-    ["prefix_tree.list"   ] = "src/prefix_tree.list",
-    ["prefix_tree.utils"  ] = "src/prefix_tree.utils",
+    ["prefix_tree.tree"   ] = "src/prefix_tree/tree.lua",
+    ["prefix_tree.list"   ] = "src/prefix_tree/list.lua",
+    ["prefix_tree.utils"  ] = "src/prefix_tree/utils.lua",
   }
 }
