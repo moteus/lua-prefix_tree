@@ -1,4 +1,7 @@
 # lua-prefix_tree
+[![Licence](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENCE.txt)
+[![Build Status](https://travis-ci.org/moteus/lua-prefix_tree.svg?branch=master)](https://travis-ci.org/moteus/lua-prefix_tree)
+[![Coverage Status](https://coveralls.io/repos/github/moteus/lua-prefix_tree/badge.svg)](https://coveralls.io/github/moteus/lua-prefix_tree)
 
 ```Lua
 local tree = prefix_tree.new()
