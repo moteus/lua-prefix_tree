@@ -1,0 +1,47 @@
+language: c
+
+sudo: false
+
+matrix:
+  include:
+    - compiler: ": Lua51"
+      env: LUA="lua 5.1"
+    - compiler: ": Lua52"
+      env: LUA="lua 5.2"
+    - compiler: ": Lua53"
+      env: LUA="lua 5.3"
+    - compiler: ": LuaJIT20"
+      env: LUA="luajit 2.0"
+    - compiler: ": LuaJIT21"
+      env: LUA="luajit 2.1"
+
+cache:
+  directories:
+    - here
+    - $HOME/.cache/pip
+
+before_install:
+  - export CC=gcc
+  - pip install --user hererocks
+  - hererocks here -r^ --$LUA;
+  - export PATH=$PATH:$PWD/here/bin
+
+install:
+  - luarocks show lpeg      || luarocks install lpeg
+  - luarocks make rockspecs/prefix_tree-scm-0.rockspec
+
+before_script:
+  - luarocks show luacov-coveralls || luarocks install luacov-coveralls
+  - luarocks show lunitx           || luarocks install lunitx
+
+script:
+  - lua -lluacov -e'require "prefix_tree.tree".__self_test()'
+  - lua -lluacov -e'require "prefix_tree.list".__self_test()'
+
+after_success:
+  - luacov-coveralls
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
