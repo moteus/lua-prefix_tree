@@ -133,7 +133,7 @@ function DecodeAppend(append,pack_range)
       local len = math.max(#beg, #en)
       if len > 0 then
         local t = {}
-        for i = beg, en do
+        for i = tonumber(beg), tonumber(en) do
           local s = sub_prefix .. ut.fitstr(tostring(i), '0', len)
           for k,v in ipairs(new_append) do
             t[#t + 1] = v..s
