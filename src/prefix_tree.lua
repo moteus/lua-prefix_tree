@@ -7,30 +7,32 @@ local _VERSION   = '0.1.0-dev'
 local _NAME      = 'prefix_tree'
 
 
-local function LoadPrefixFromFile_impl(FileName_or_file, functor, pack_range)
-  local file, do_close
+local function decode_file_list(FileName_or_file, functor, pack_range)
+  local file, do_close, err
   if type(FileName_or_file) == 'string' then
-    file = assert(io.open(FileName_or_file,'r'),'Can not open file "' .. FileName_or_file .. '"!')
-    do_close = true
+    do_close, file, err = true, io.open(FileName_or_file,'r')
+    if not err then return nil, err end
   else
     file = assert(FileName_or_file)
   end
 
-  local line_no = 0
-  ut.try(function()
-    for str in file:lines() do
-      line_no = line_no + 1
-      local prefixes, value = ut.split_first(str, '\t', true)
-      if not list.decode(functor, pack_range, prefixes, value or '') then
-        error("Error prefix at line " .. line_no .. ": " .. (prefixes or '<EMPTY>'))
-      end
+  local prefix_count, line_no = 0, 0
+  for str in file:lines() do
+    line_no = line_no + 1
+    local prefixes, value = ut.split_first(str, '\t', true)
+    local count = list.decode(functor, pack_range, prefixes, value or '')
+    if not count then
+      err = "Error prefix at line " .. line_no .. ": `" .. (prefixes or '') .. "`"
+      break
     end
-    if do_close then file:close() end
-  end,
-  function(e) --catch
-    if do_close then file:close() end
-    error(e)
-  end)
+    prefix_count = prefix_count + count
+  end
+
+  if do_close then file:close() end
+
+  if err then return nil, err end
+
+  return prefix_count
 end
 
 ---
@@ -64,7 +66,7 @@ end
 --- Добавляет несколько префиксов
 -- ret_list - true - вернуть список добаленных префиксов
 -- pack - true сжимать диапазоны  во время загрузки
-function tree_index:add_list( str, val, pack, ret_list )
+function tree_index:add_list( str, value, pack, ret_list )
   local t = ret_list and {}
 
   if pack then
@@ -73,10 +75,10 @@ function tree_index:add_list( str, val, pack, ret_list )
     end
   end
 
-  local n = list.decode(function(prefix, value)
+  local n = list.decode(function(prefix)
     self:add(prefix, value)
     if ret_list then t[#t+1] = prefix end
-  end, pack, str, val)
+  end, pack, str)
 
   if not n then return false end
 
@@ -147,6 +149,8 @@ function tree_index:sub_tree( key )
   return t
 end
 
+--- Преобразует значения для префиксов
+-- 
 function tree_index:transform(func)
   tree.transform(self._data, func)
   return self
@@ -154,6 +158,7 @@ end
 
 function tree_index:clear()
   self._data = {}
+  return self
 end
 
 ---
@@ -167,33 +172,12 @@ function tree_index:keys()
 end
 
 ---
--- возвращает множество ключей
-function tree_index:key_set(val)
-  if val == nil then val = true end
-  local t = {}
-  self:for_each(function(prefix)
-    t[prefix] = val
-  end)
-  return t
-end
-
----
 --
 function tree_index:values()
   local t = {}
   self:for_each(function(prefix,val)
     t[prefix] = val
   end)
-  return t
-end
-
----
---
-function tree_index:set_values(t)
-  self:clear()
-  for prefix,value in pairs(t)do
-    self:add(prefix,value)
-  end
   return t
 end
 
@@ -227,29 +211,29 @@ function tree_index:expand( keys, clone )
   end
 end
 
-
 ---
 -- fn   pack_range - функция для сжатия диапазонов 
 -- bool ret_list   - возвращать список префикс => строка из которой он сформирован
 --
-function tree_index:load(FileName, pack_range, ret_list)
+function tree_index:load_file(FileName, pack_range, ret_list)
   local add_prefix, prefix_list_t
 
   if ret_list then
     prefix_list_t = {}
-    add_prefix = function(prefix, value, list)
-      self:add(prefix,value)
-      prefix_list_t[prefix] = list
+    add_prefix = function(prefix, str, value)
+      self:add(prefix, value)
+      prefix_list_t[prefix] = str
     end
   else
-    add_prefix = function(prefix, value)self:add(prefix,value)end
+    add_prefix = function(prefix, _, value) self:add(prefix, value) end
   end
 
-  LoadPrefixFromFile_impl(FileName, add_prefix, pack_range)
+  local n, err = decode_file_list(FileName, add_prefix, pack_range)
 
-  return prefix_list_t or true
+  if not n then return nil, err end
+  
+  return prefix_list_t or n
 end
-
 
 ---
 -- serialize
@@ -269,18 +253,17 @@ function tree_index:deserialize(unpacker, str)
     return nil, "invalid format"
   end
 
-  return setmetatable({
-    data           = t.data;
-    invalid_value  = t.invalid_value;
-    char_set       = t.char_set;
-  }, tree_index_mt)
+  local o = tree_index.new(t.invalid_value, t.char_set)
+  o._data = t.data
+
+  return o
 end
 
 end
 
 local function LoadPrefixFromFile(...)
   local tree          = tree_index:new()
-  local prefix_list_t = tree:load(...)
+  local prefix_list_t = assert(tree:load_file(...))
   return tree, prefix_list_t
 end
 

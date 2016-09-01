@@ -7,6 +7,7 @@ local TEST_CASE   = require "lunit".TEST_CASE
 local RUN, IT = utils.RUN, utils.IT
 
 local print, require, ipairs, tonumber, tostring = print, require, ipairs, tonumber, tostring
+local io, os = io, os
 
 local ptree = require "prefix_tree"
 
@@ -175,6 +176,55 @@ it('should check exists only full prefix', function()
   assert_true(tree:exists('123'))
 end)
 
+it('should work with empty prefix', function()
+  tree:add('', 'allow')
+  assert_true(tree:exists(''))
+  assert_equal('allow', tree:find(''))
+  assert_equal('allow', tree:find('123456'))
+end)
+
 end
+
+local _ENV = TEST_CASE'prefix_tree.load_file' if ENABLE then
+local it = IT(_ENV)
+
+local tree, file
+
+local fname = './prefixes.pfx'
+
+function setup()
+  tree = ptree.new()
+  file = assert(io.open(fname, 'w+'))
+end
+
+function teardown()
+  file:close()
+  os.remove(fname)
+end
+
+it('should load using file handle', function()
+  file:write('43 7-8 10, 11'             .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('43 7 30, 40'               .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('47 0, 1, 810-815, 85, 880' .. '\t' .. 'Norway mob. special services' .. '\n')
+  file:seek('set', 0)
+
+  assert_equal(16, tree:load_file(file))
+  assert_equal('Austria Special services', tree:find('4371003760056'))
+  assert_true(tree:exists('43811'))
+  assert_true(tree:exists('47812'))
+end)
+
+it('should not raise error', function()
+  file:write('43 7-8 10, 11'             .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('43 7 30, 40'               .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('47 0, 1, 810-815, 85, 880' .. '\t' .. 'Norway mob. special services' .. '\n')
+  file:write('some-invalid-value'        .. '\t' .. 'hello there'                  .. '\n')
+  file:seek('set', 0)
+
+  assert_nil(tree:load_file(file))
+end)
+
+end
+
 
 RUN()

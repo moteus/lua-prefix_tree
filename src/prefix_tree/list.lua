@@ -148,13 +148,13 @@ end
 
 end
 
-local function ProcessPrefixes(functor, t, value, prefix_str, pack_range)
+local function ProcessPrefixes(functor, pack_range, t, prefix_str, ...)
   local c = 0
   for _, prefix in ipairs(t.list) do
     if type(prefix) == 'string' then 
       for _,main_prefix in ipairs(t.append) do
         c = c + 1
-        functor(main_prefix .. prefix, value, prefix_str)
+        functor(main_prefix .. prefix, prefix_str, ...)
       end
     else
       local sub_prefix, beg, en = assert(prefix.sub), assert(prefix.beg), assert(prefix.en)
@@ -166,7 +166,7 @@ local function ProcessPrefixes(functor, t, value, prefix_str, pack_range)
         for _,main_prefix in ipairs(t.append) do
           local s = main_prefix .. sub_prefix .. ut.fitstr(tostring(i), '0', len)
           c = c + 1
-          functor(s, value, prefix_str)
+          functor(s, prefix_str, ...)
         end
       end
     end
@@ -174,7 +174,7 @@ local function ProcessPrefixes(functor, t, value, prefix_str, pack_range)
   return c
 end
 
-local function DecodePrefixString(functor, pack_range, prefixes, value)
+local function DecodePrefixString(functor, pack_range, prefixes, ...)
   local t = DecodePrefixList(prefixes)
   if not t then return end
 
@@ -186,7 +186,7 @@ local function DecodePrefixString(functor, pack_range, prefixes, value)
     else
       p.append = DecodeAppend(p.append)
     end
-    c = c + ProcessPrefixes(functor, p, value, prefixes, pack_range)
+    c = c + ProcessPrefixes(functor, pack_range, p, prefixes, ...)
   end
 
   return c
