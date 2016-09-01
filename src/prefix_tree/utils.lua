@@ -1,9 +1,3 @@
-local function try(f, catch_f)
-  local ok, exception = pcall(f)
-  if not ok then
-    if catch_f then catch_f(exception) else error(exception) end
-  end
-end
 
 local function fitstr(str, ch, width)
   if #str >= width then

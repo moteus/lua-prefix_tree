@@ -146,6 +146,35 @@ it('should returns packed prefixes', function()
   end
 end)
 
+it('should padding append range', function()
+  tree:add_list('7 49-499', 'allow')
+
+  p1 = tree:keys()
+
+  local set = {}
+  assert_equal(7499 - 7049 + 1, #p1)
+  for _, prefix in ipairs(p1) do
+    assert(tonumber(prefix) >= 7049 and tonumber(prefix) <= 7499, prefix)
+    assert_nil(set[prefix])set[prefix] = true
+  end
+end)
+
+it('should padding prefix range', function()
+  tree:add_list('49-499', 'allow')
+
+  p1 = tree:keys()
+
+  local set = {}
+  assert_equal(499 - 49 + 1, #p1)
+  for _, prefix in ipairs(p1) do
+    assert(tonumber(prefix) >= 49 and tonumber(prefix) <= 499, prefix)
+    assert_nil(set[prefix])set[prefix] = true
+  end
+
+  assert_true (tree:exists('050'))
+  assert_false(tree:exists('50'))
+end)
+
 end
 
 local _ENV = TEST_CASE'prefix_tree.API' if ENABLE then
