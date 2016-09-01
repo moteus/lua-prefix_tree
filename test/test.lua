@@ -37,7 +37,7 @@ function setup()
   tree = ptree.new()
 end
 
-it('should decode range', function()
+it('should decode append range', function()
   tree:add_list('7 495-499', 'allow')
 
   assert_nil  (         tree:find('74941'))
@@ -46,6 +46,25 @@ it('should decode range', function()
   assert_equal('allow', tree:find('74971'))
   assert_equal('allow', tree:find('74981'))
   assert_equal('allow', tree:find('74991'))
+end)
+
+it('should decode prefix range', function()
+  tree:add_list('7495-7499', 'allow')
+
+  assert_nil  (         tree:find('74941'))
+  assert_equal('allow', tree:find('74951'))
+  assert_equal('allow', tree:find('74961'))
+  assert_equal('allow', tree:find('74971'))
+  assert_equal('allow', tree:find('74981'))
+  assert_equal('allow', tree:find('74991'))
+end)
+
+it('should decode multi lists', function()
+  tree:add_list('7 495-499; 7 9 10-19', 'allow')
+
+  assert_true (tree:exists('7495'))
+  assert_true (tree:exists('7495'))
+  assert_false(tree:exists('74997'))
 end)
 
 end
