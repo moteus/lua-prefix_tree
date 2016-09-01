@@ -227,7 +227,7 @@ function setup()
 end
 
 function teardown()
-  file:close()
+  if file then file:close() end
   os.remove(fname)
 end
 
@@ -238,6 +238,18 @@ it('should load using file handle', function()
   file:seek('set', 0)
 
   assert_equal(16, tree:load_file(file))
+  assert_equal('Austria Special services', tree:find('4371003760056'))
+  assert_true(tree:exists('43811'))
+  assert_true(tree:exists('47812'))
+end)
+
+it('should load using file name', function()
+  file:write('43 7-8 10, 11'             .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('43 7 30, 40'               .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('47 0, 1, 810-815, 85, 880' .. '\t' .. 'Norway mob. special services' .. '\n')
+  file:close() file = nil
+
+  assert_equal(16, tree:load_file(fname))
   assert_equal('Austria Special services', tree:find('4371003760056'))
   assert_true(tree:exists('43811'))
   assert_true(tree:exists('47812'))
