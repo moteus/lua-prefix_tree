@@ -45,7 +45,7 @@ local tree_index = ut.class() do
 function tree_index:__init(invalid_value, char_set)
   self._data           = {}
   self._invalid_value  = invalid_value or {}
-  self.char_set       = char_set or tree.default_char_set;
+  self._char_set       = char_set or tree.default_char_set;
 
   return self
 end
@@ -139,10 +139,10 @@ function tree_index:sub_tree( key )
   local data = tree.sub_tree(self._data, key)
   if not data then return end
 
-  local t = {data = data}
-  for k, v in pairs(self) do
-    if t[k] == nil then t[k] = v end
-  end
+  t = tree_index.new(
+    self._invalid_value, self._char_set
+  )
+  t._data = data
 
   return t
 end
@@ -257,7 +257,7 @@ function tree_index:serialize(packer)
   return packer{
     data           = self._data;
     invalid_value  = self._invalid_value;
-    char_set       = self.char_set;
+    char_set       = self._char_set;
   }
 end
 
