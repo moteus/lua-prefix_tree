@@ -6,12 +6,11 @@ local _COPYRIGHT = "Copyright (C) 2016 Alexey Melnichuk";
 local _VERSION   = '0.1.0-dev'
 local _NAME      = 'prefix_tree'
 
-
 local function decode_file_list(FileName_or_file, functor, pack_range)
   local file, do_close, err
   if type(FileName_or_file) == 'string' then
     do_close, file, err = true, io.open(FileName_or_file,'r')
-    if not err then return nil, err end
+    if not file then return nil, err end
   else
     file = assert(FileName_or_file)
   end
