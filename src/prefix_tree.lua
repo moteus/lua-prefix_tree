@@ -64,7 +64,7 @@ end
 --- Добавляет несколько префиксов
 -- ret_list - true - вернуть список добаленных префиксов
 -- pack - true сжимать диапазоны  во время загрузки
-function tree_index:add_list( str, val, ret_list, pack )
+function tree_index:add_list( str, val, pack, ret_list )
   local t = ret_list and {}
 
   if pack then

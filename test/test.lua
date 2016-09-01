@@ -6,7 +6,7 @@ local utils       = require "utils"
 local TEST_CASE   = require "lunit".TEST_CASE
 local RUN, IT = utils.RUN, utils.IT
 
-local print, require = print, require
+local print, require, ipairs, tonumber, tostring = print, require, ipairs, tonumber, tostring
 
 local ptree = require "prefix_tree"
 
@@ -82,8 +82,8 @@ it('should create all prefixes', function()
 end)
 
 it('should reduce number of prefixes', function()
-  tree:add_list('7 49500-49599', 'allow', false, true)
-  tree:add_list('749900-749999', 'allow', false, true)
+  tree:add_list('7 49500-49599', 'allow', true)
+  tree:add_list('749900-749999', 'allow', true)
 
   assert_true  (tree:exists('7495'))
   assert_true  (tree:exists('7499'))
@@ -96,7 +96,7 @@ it('should reduce number of prefixes', function()
 end)
 
 it('should preserve leading zeros', function()
-  tree:add_list('7 09500-09599', 'allow', false, true)
+  tree:add_list('7 09500-09599', 'allow', true)
   tree:add_list('7 09900-09999', 'allow')
   tree:add_list('0 09900-09999', 'allow')
   tree:add_list('005500-005599', 'allow')
@@ -105,6 +105,44 @@ it('should preserve leading zeros', function()
   assert_true  (tree:exists('709900'))
   assert_true  (tree:exists('009900'))
   assert_true  (tree:exists('005500'))
+end)
+
+it('should returns prefixes', function()
+  local p1 = assert_table(tree:add_list('7 49500-49599', 'allow', false, true))
+  local p2 = assert_table(tree:add_list('749900-749999', 'allow', false, true))
+
+  local set = {}
+  assert_equal(100, #p1)
+  for _, prefix in ipairs(p1) do
+    assert(tonumber(prefix) >= 749500 and tonumber(prefix) <= 749599, prefix)
+    assert_nil(set[prefix])set[prefix] = true
+  end
+
+  local set = {}
+  assert_equal(100, #p2)
+  for _, prefix in ipairs(p2) do
+    assert(tonumber(prefix) >= 749900 and tonumber(prefix) <= 749999, prefix)
+    assert_nil(set[prefix], prefix)set[prefix] = true
+  end
+end)
+
+it('should returns packed prefixes', function()
+  local p1 = assert_table(tree:add_list('7 49500-49599', 'allow', true, true))
+  local p2 = assert_table(tree:add_list('749900-749999', 'allow', true, true))
+
+  local set = {}
+  assert_equal(1, #p1)
+  for _, prefix in ipairs(p1) do
+    assert(tonumber(prefix) >= 7495 and tonumber(prefix) <= 7495, prefix)
+    assert_nil(set[prefix])set[prefix] = true
+  end
+
+  local set = {}
+  assert_equal(1, #p2)
+  for _, prefix in ipairs(p2) do
+    assert(tonumber(prefix) >= 7499 and tonumber(prefix) <= 7499, prefix)
+    assert_nil(set[prefix], prefix)set[prefix] = true
+  end
 end)
 
 end
