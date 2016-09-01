@@ -162,7 +162,7 @@ local function ProcessPrefixes(functor, t, value, prefix_str, pack_range)
         beg, en = pack_range(beg, en)
       end
       local len = math.max(#beg, #en)
-      for i = beg, en do
+      for i = tonumber(beg), tonumber(en) do
         for _,main_prefix in ipairs(t.append) do
           local s = main_prefix .. sub_prefix .. ut.fitstr(tostring(i), '0', len)
           c = c + 1
