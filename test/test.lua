@@ -264,6 +264,17 @@ it('should returns prefixes', function()
   assert_equal('47 0, 1, 810-815, 85, 880', t['47812'])
 end)
 
+it('should load prefixes without values', function()
+  file:write('43 7-8 10, 11'             .. '\n')
+  file:write('43 7 30, 40'               .. '\n')
+  file:write('47 0, 1, 810-815, 85, 880' .. '\n')
+  file:seek('set', 0)
+
+  assert_equal(16, tree:load_file(file))
+  assert_equal('', tree:find('43811'))
+  assert_equal('', tree:find('47812'))
+end)
+
 end
 
 
