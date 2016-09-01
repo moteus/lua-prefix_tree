@@ -255,6 +255,10 @@ it('should load using file name', function()
   assert_true(tree:exists('47812'))
 end)
 
+it('load from unexisted file', function()
+  assert_nil(tree:load_file('./some_file_name'))
+end)
+
 it('should not raise error', function()
   file:write('43 7-8 10, 11'             .. '\t' .. 'Austria Special services'     .. '\n')
   file:write('43 7 30, 40'               .. '\t' .. 'Austria Special services'     .. '\n')
