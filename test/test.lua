@@ -224,6 +224,17 @@ it('should not raise error', function()
   assert_nil(tree:load_file(file))
 end)
 
+it('should returns prefixes', function()
+  file:write('43 7-8 10, 11'             .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('43 7 30, 40'               .. '\t' .. 'Austria Special services'     .. '\n')
+  file:write('47 0, 1, 810-815, 85, 880' .. '\t' .. 'Norway mob. special services' .. '\n')
+  file:seek('set', 0)
+
+  local t = assert_table(tree:load_file(file, false, true))
+  assert_equal('43 7-8 10, 11', t['43811'])
+  assert_equal('47 0, 1, 810-815, 85, 880', t['47812'])
+end)
+
 end
 
 
