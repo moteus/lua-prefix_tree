@@ -3,7 +3,7 @@ local list = require "prefix_tree.list"
 local ut   = require "prefix_tree.utils"
 
 local _COPYRIGHT = "Copyright (C) 2016 Alexey Melnichuk";
-local _VERSION   = '0.1.0-dev'
+local _VERSION   = '0.1.0'
 local _NAME      = 'prefix_tree'
 
 local function decode_file_list(FileName_or_file, functor, pack_range)
