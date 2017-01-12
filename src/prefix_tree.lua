@@ -258,6 +258,16 @@ function tree_index:deserialize(unpacker, str)
   return o
 end
 
+function tree_index:invalid_value()
+  return self._invalid_value()
+end
+
+function tree_index:set_invalid_value(value)
+  local v = self._invalid_value
+  self._invalid_value = value
+  return v
+end
+
 end
 
 local function LoadPrefixFromFile(...)
