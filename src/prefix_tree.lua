@@ -45,7 +45,7 @@ local tree_index = ut.class() do
 -- ctor
 function tree_index:__init(invalid_value, char_set)
   self._data           = {}
-  self._invalid_value  = invalid_value or {}
+  self._invalid_value  = invalid_value
   self._char_set       = char_set or tree.default_char_set;
 
   return self
