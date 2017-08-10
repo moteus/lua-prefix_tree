@@ -259,7 +259,7 @@ function tree_index:deserialize(unpacker, str)
 end
 
 function tree_index:invalid_value()
-  return self._invalid_value()
+  return self._invalid_value
 end
 
 function tree_index:set_invalid_value(value)

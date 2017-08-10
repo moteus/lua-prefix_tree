@@ -212,6 +212,14 @@ it('should work with empty prefix', function()
   assert_equal('allow', tree:find('123456'))
 end)
 
+it('should set/get invalid value', function()
+  local v = '----'
+  assert_nil(tree:set_invalid_value(v))
+  assert_equal(v, tree:invalid_value())
+  assert_equal(v, tree:set_invalid_value(false))
+  assert_false(tree:invalid_value())
+end)
+
 end
 
 local _ENV = TEST_CASE'prefix_tree.load_file' if ENABLE then
