@@ -14,6 +14,10 @@ matrix:
       env: LUA="luajit 2.0"
     - compiler: ": LuaJIT21"
       env: LUA="luajit 2.1"
+    - compiler: ": LuaJIT20"
+      env: LUA="luajit 2.0" COMPAT=5.2
+    - compiler: ": LuaJIT21"
+      env: LUA="luajit 2.1" COMPAT=5.2
 
 cache:
   directories:
@@ -23,7 +27,7 @@ cache:
 before_install:
   - export CC=gcc
   - pip install --user hererocks
-  - hererocks here -r^ --$LUA;
+  - hererocks here -r^ --$LUA --compat ${COMPAT:-default}
   - export PATH=$PATH:$PWD/here/bin
 
 install:
@@ -31,7 +35,7 @@ install:
   - luarocks make rockspecs/prefix_tree-scm-0.rockspec
 
 before_script:
-  - luarocks show luacov-coveralls || luarocks install luacov-coveralls
+  - luarocks show luacov-coveralls || luarocks install luacov-coveralls --server=http://luarocks.org/dev
   - luarocks show lunitx           || luarocks install lunitx
 
 script:
@@ -41,7 +45,7 @@ script:
   - lunit.sh test.lua
 
 after_success:
-  - luacov-coveralls
+  - luacov-coveralls -v
 
 notifications:
   email:
